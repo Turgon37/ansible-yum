@@ -1,0 +1,7 @@
+---
+
+- name: Install yum packages
+  package:
+    name:  '{{ item }}'
+    state: present
+  with_items: '{{ yum__packages_names }}'

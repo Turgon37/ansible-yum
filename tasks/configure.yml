@@ -1,0 +1,14 @@
+---
+- name: Create the directory for YUM configuration
+  file:
+    path:  '{{ item }}'
+    owner: root
+    group: root
+    mode:  0755
+    state: directory
+  with_items:
+    - '{{ yum__conf_dir }}'
+    - '{{ yum__repos_dir }}'
+
+#- import_tasks: configure-keys.yml
+#- import_tasks: configure-repositories.yml

@@ -1,0 +1,71 @@
+#!/usr/bin/env python
+
+import json
+import os
+import re
+import subprocess
+import sys
+
+content={
+  'reboot_required': None,
+  'update_last_success': None,
+  'packages_updates' : [],
+  'updates' : None,
+  'packages_security_updates': [],
+  'security_updates': None
+}
+
+# Regexp that match package names
+reg_redhat_package_name = re.compile('^(?P<name>[a-zA-Z0-9_-]+)\.[a-z0-9_-]+\s+')
+
+def is_exe(fpath):
+    """Test if the given file exist and is executable
+    """
+    return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
+
+def setUpgradablesPackages(cmd, update_regexp, security_update_regexp=None):
+    """Compute upgradable package for the given distribution
+    """
+    if not is_exe(cmd[0]):
+        content['error'] = cmd[0] + ' not available'
+        return
+    try:
+        with open(os.devnull, 'w') as devnull:
+            result = subprocess.check_output(cmd, stderr=devnull)
+    except subprocess.CalledProcessError as e:
+        content['error'] = str(e)
+        return
+    for line in result.splitlines():
+        match = update_regexp.match(line)
+        if match:
+            content['packages_updates'].append(match.group('name'))
+            if security_update_regexp and security_update_regexp.search(line):
+                content['packages_security_updates'].append(match.group('name'))
+
+
+if __name__ == '__main__':
+    # REDHAT SPECIFIC
+    # REBOOT
+    try:
+        with open(os.devnull, 'w') as devnull:
+            code = subprocess.call(['needs-restarting', '-r'], stdout=devnull, stderr=devnull)
+        if code == 1:
+            content['reboot_required'] = True
+        else:
+            content['reboot_required'] = False
+    except subprocess.CalledProcessError as e:
+        content['error'] = str(e)
+    # UPDATES
+    setUpgradablesPackages(['/usr/bin/yum', 'check-update', '|| exit 0'],
+                            reg_redhat_package_name)
+
+    # COMMON
+    content['updates'] = len(content['packages_updates'])
+    content['security_updates'] = len(content['packages_security_updates'])
+    if content['updates'] > 0:
+        content['has_updates'] = True
+    else:
+        content['has_updates'] = False
+
+    print(json.dumps(content))
+    sys.exit(0)

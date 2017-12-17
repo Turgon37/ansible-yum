@@ -1,0 +1,19 @@
+---
+# defaults file for yum
+
+# Enable facts deploiement
+yum__facts: True
+
+# Choose the monitoring backend to configure (if available)
+#yum__monitoring:
+
+# List of dependencies packages
+yum__packages_names:
+  - yum-utils
+  - yum-cron
+
+# Configuration file for YUM
+yum__conf_dir: /etc/yum/
+
+# Repositories directory
+yum__repos_dir: /etc/yum.repos.d/

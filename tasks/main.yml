@@ -1,0 +1,32 @@
+---
+# tasks file for yum
+
+- name: Include the OS specific variables
+  include_vars: "{{ item }}"
+  with_first_found:
+    - files:
+        - "{{ ansible_distribution }}-{{ ansible_distribution_version }}.yml"
+        - "{{ ansible_distribution }}.yml"
+        - "{{ ansible_os_family }}.yml"
+        - "defaults.yml"
+      skip: true
+  tags: ['always']
+
+- name: Check role availability
+  fail:
+    msg: 'This module only works on RedHat or derivatives like CentOS'
+  when: ansible_os_family != 'RedHat'
+
+- import_tasks: install.yml
+  tags: ['yum', 'yum-install']
+
+- import_tasks: configure.yml
+  tags: ['yum', 'yum-configure']
+
+- include_tasks: 'monitoring-{{ yum__monitoring }}.yml'
+  when: yum__monitoring is defined
+  tags: ['yum', 'yum-monitoring']
+
+- include_tasks: facts.yml
+  when: yum__facts|bool
+  tags: ['yum', 'yum-facts']
