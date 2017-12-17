@@ -9,8 +9,9 @@ yum__facts: True
 
 # List of dependencies packages
 yum__packages_names:
-  - yum-utils
   - yum-cron
+  - yum-plugin-post-transaction-actions
+  - yum-utils
 
 # Configuration file for YUM
 yum__conf_dir: /etc/yum/
