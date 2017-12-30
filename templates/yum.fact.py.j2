@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+# {{ ansible_managed }}
+
 import json
 import os
 import re
@@ -31,7 +33,7 @@ def setUpgradablesPackages(cmd, update_regexp, security_update_regexp=None):
         return
     try:
         with open(os.devnull, 'w') as devnull:
-            result = subprocess.check_output(cmd, stderr=devnull)
+            result = subprocess.check_output(' '.join(cmd), stderr=devnull, shell=True)
     except subprocess.CalledProcessError as e:
         content['error'] = str(e)
         return
@@ -56,7 +58,7 @@ if __name__ == '__main__':
     except subprocess.CalledProcessError as e:
         content['error'] = str(e)
     # UPDATES
-    setUpgradablesPackages(['/usr/bin/yum', 'check-update', '|| exit 0'],
+    setUpgradablesPackages(['/usr/bin/yum', '--color=never', 'check-update', '|| exit 0'],
                             reg_redhat_package_name)
 
     # COMMON
