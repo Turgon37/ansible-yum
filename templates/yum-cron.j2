@@ -1,0 +1,68 @@
+#
+# {{ ansible_managed }}
+#
+{% set config = item.value %}
+{#
+ # Macro to get a setting value
+ #
+ # @param key : the name of the setting to get value for
+ # @return string
+ #}
+{%- macro yumCronSetting(key) -%}
+{{ key }} = {{ config[key]|d(yum__cron_settings[key]) }}
+{%- endmacro -%}
+[commands]
+{{ yumCronSetting('update_messages') }}
+{{ yumCronSetting('download_updates') }}
+{{ yumCronSetting('apply_updates') }}
+
+{{ yumCronSetting('update_cmd') }}
+
+{{ yumCronSetting('random_sleep') }}
+
+
+[emitters]
+# Name to use for this system in messages that are emitted.  If
+# system_name is None, the hostname will be used.
+system_name = None
+
+# How to send messages.  Valid options are stdio and email.  If
+# emit_via includes stdio, messages will be sent to stdout; this is useful
+# to have cron send the messages.  If emit_via includes email, this
+# program will send email itself according to the configured options.
+# If emit_via is None or left blank, no messages will be sent.
+emit_via = stdio
+
+# The width, in characters, that messages that are emitted should be
+# formatted to.
+output_width = 80
+
+
+[email]
+{{ yumCronSetting('email_from') }}
+{{ yumCronSetting('email_to') }}
+{{ yumCronSetting('email_host') }}
+
+
+[groups]
+# NOTE: This only works when group_command != objects, which is now the default
+# List of groups to update
+group_list = None
+
+# The types of group packages to install
+group_package_types = mandatory, default
+
+[base]
+# This section overrides yum.conf
+
+# Use this to filter Yum core messages
+# -4: critical
+# -3: critical+errors
+# -2: critical+errors+warnings (default)
+debuglevel = -2
+
+# skip_broken = True
+mdpolicy = group:main
+
+# Uncomment to auto-import new gpg keys (dangerous)
+# assumeyes = True

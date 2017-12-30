@@ -1,0 +1,7 @@
+#
+# {{ ansible_managed }}
+#
+
+[main]
+enabled = {{ yum__plugin_post_actions_enabled|bool|ternary('1', '0') }}
+actiondir = {{ yum__plugin_post_actions_conf_dir }}/

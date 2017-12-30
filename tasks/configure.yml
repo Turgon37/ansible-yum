@@ -9,6 +9,27 @@
   with_items:
     - '{{ yum__conf_dir }}'
     - '{{ yum__repos_dir }}'
+    - '{{ yum__plugins_conf_dir }}'
+    - '{{ yum__plugin_post_actions_conf_dir }}'
+    - '{{ yum__periodic_directory }}'
+
+- name: Update yum-cron configurations
+  template:
+    src:   yum-cron.j2
+    dest:  "{{ yum__conf_dir }}/{{ item.key~'.conf' }}"
+    owner: root
+    group: root
+    mode:  0644
+  with_dict: '{{ yum__cron_configs }}'
+
+- name: Update yum plugins configuration files
+  template:
+    src:   '{{ item }}'
+    dest:  "{{ yum__plugins_conf_dir }}/{{ item|replace('.j2', '') }}"
+    owner: root
+    group: root
+    mode:  0644
+  with_items: '{{ yum__plugins_conf_templates }}'
 
 #- import_tasks: configure-keys.yml
 #- import_tasks: configure-repositories.yml

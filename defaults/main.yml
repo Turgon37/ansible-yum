@@ -13,8 +13,103 @@ yum__packages_names:
   - yum-plugin-post-transaction-actions
   - yum-utils
 
-# Configuration file for YUM
-yum__conf_dir: /etc/yum/
+# Main configuration directory for YUM
+yum__conf_dir: /etc/yum
 
 # Repositories directory
-yum__repos_dir: /etc/yum.repos.d/
+yum__repos_dir: /etc/yum.repos.d
+
+# Where to store yum working files
+yum__var_dir: /var/lib/yum
+
+
+## Yum cron
+# Yum cron configurations
+
+# the following dict contains defaults yum crn configuration and values
+yum__cron_settings_defaults:
+  # Whether updates should be downloaded when they are available.
+  download_updates: 'yes'
+  # Whether a message should be emitted when updates are available,
+  # were downloaded, or applied.
+  update_messages: 'yes'
+  # Whether updates should be applied when they are available.  Note
+  # that download_updates must also be yes for the update to be applied.
+  apply_updates: 'no'
+  # List of addresses to send messages to.
+  email_to: root
+  # Following keys are availables
+  # The address to send email messages from.
+  # NOTE: 'localhost' will be replaced with the value of system_name.
+  email_from: root@localhost
+  # Name of the host to connect to to send email messages.
+  email_host: localhost
+  #  What kind of update to use:
+  # default                            = yum upgrade
+  # security                           = yum --security upgrade
+  # security-severity:Critical         = yum --sec-severity=Critical upgrade
+  # minimal                            = yum --bugfix update-minimal
+  # minimal-security                   = yum --security update-minimal
+  # minimal-security-severity:Critical =  --sec-severity=Critical update-minimal
+  update_cmd: default
+  # Maximum amout of time to randomly sleep, in minutes.  The program
+  # will sleep for a random amount of time between 0 and random_sleep
+  # minutes before running.  This is useful for e.g. staggering the
+  # times that multiple systems will access update servers.  If
+  # random_sleep is 0 or negative, the program will run immediately.
+  # 6*60 = 360
+  random_sleep: 360
+
+# Yum cron defaults settings override globaly
+yum__cron_settings_global: {}
+# Yum cron defaults settings override per hostgroup
+yum__cron_settings_group: {}
+# Yum cron defaults settings override per host
+yum__cron_settings_host: {}
+
+# Merged yum-cron per configuration defaults settings
+yum__cron_settings: '{{ yum__cron_settings_defaults
+                          | combine(yum__cron_settings_global, recursive=True)
+                          | combine(yum__cron_settings_group, recursive=True)
+                          | combine(yum__cron_settings_host, recursive=True) }}'
+
+# List of yum cron profiles
+yum__cron_configs_defaults:
+  yum-cron:
+  yum-cron-hourly:
+    download_updates: 'no'
+    update_messages: 'no'
+    apply_updates: 'no'
+    random_sleep: 15
+
+yum__cron_configs_global: {}
+yum__cron_configs_group: {}
+yum__cron_configs_host: {}
+
+# Merged yum-cron per configuration defaults settings
+yum__cron_configs: '{{ yum__cron_configs_defaults
+                        | combine(yum__cron_configs_global, recursive=True)
+                        | combine(yum__cron_configs_group, recursive=True)
+                        | combine(yum__cron_configs_host, recursive=True) }}'
+
+
+## Plugins
+# Configuration directory of yum plugins
+yum__plugins_conf_dir: '{{ yum__conf_dir }}/pluginconf.d'
+
+# List of plugins configuration template to install
+yum__plugins_conf_templates:
+  - post-transaction-actions.conf.j2
+
+# Folder that contains all post actions scripts
+yum__plugin_post_actions_conf_dir: '{{ yum__conf_dir }}/post-actions'
+
+# Enable or not the yum post actions
+yum__plugin_post_actions_enabled: True
+
+
+## Misc
+# Directory where to store results of periodic tasks
+yum__periodic_directory: '{{ yum__var_dir }}/periodic'
+
+yum__update_stamp_file: '{{ yum__periodic_directory }}/update-success-stamp'
