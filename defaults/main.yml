@@ -92,6 +92,10 @@ yum__cron_configs: '{{ yum__cron_configs_defaults
                         | combine(yum__cron_configs_group, recursive=True)
                         | combine(yum__cron_configs_host, recursive=True) }}'
 
+# Configuration for pseudo yum-cron service (it simply allow yum-cron to run or not)
+yum__cron_service_name: yum-cron
+yum__cron_service_enabled: True
+
 
 ## Plugins
 # Configuration directory of yum plugins

@@ -1,0 +1,7 @@
+---
+
+- name: Ensure yum-cron service state
+  service:
+    name:    '{{ yum__cron_service_name }}'
+    enabled: "{{ yum__cron_service_enabled|bool }}"
+    state:   "{{ yum__cron_service_enabled|bool|ternary('started', 'stopped') }}"

@@ -23,6 +23,9 @@
 - import_tasks: configure.yml
   tags: ['yum', 'yum-configure']
 
+- import_tasks: service.yml
+  tags: ['yum', 'yum-service']
+
 - include_tasks: 'monitoring-{{ yum__monitoring }}.yml'
   when: yum__monitoring is defined
   tags: ['yum', 'yum-monitoring']
