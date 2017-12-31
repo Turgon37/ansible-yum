@@ -58,7 +58,7 @@ if __name__ == '__main__':
     except subprocess.CalledProcessError as e:
         content['error'] = str(e)
     # UPDATES
-    setUpgradablesPackages(['/usr/bin/yum', '--color=never', 'check-update', '|| exit 0'],
+    setUpgradablesPackages(['/usr/bin/yum', '--color=never', '--quiet', 'check-update', '|| exit 0'],
                             reg_redhat_package_name)
 
     # COMMON

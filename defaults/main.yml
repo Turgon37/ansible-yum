@@ -115,5 +115,3 @@ yum__plugin_post_actions_enabled: True
 ## Misc
 # Directory where to store results of periodic tasks
 yum__periodic_directory: '{{ yum__var_dir }}/periodic'
-
-yum__update_stamp_file: '{{ yum__periodic_directory }}/update-success-stamp'
