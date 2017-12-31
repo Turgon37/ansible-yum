@@ -11,4 +11,20 @@
         - key: yum.cache_last_update_stamp
           command: /bin/bash -c 'if [ -f /var/cache/yum/*/*/base/cachecookie ]; then /usr/bin/env stat --format=%Y /var/cache/yum/*/*/base/cachecookie; else echo -n 0; fi' | tr -d '\n'
           comment: timestamp of the last yum cache update
+        - key: yum.updates
+          command: >
+            {%- if yum__periodic_use_cached_updates_list|bool -%}
+            /bin/bash -c "if [ -f {{ yum__cached_updates_file }} ]; then wc --lines < {{ yum__cached_updates_file }}; else echo -n 'ZBX_NOTSUPPORTED'; fi"
+            {%- else -%}
+            /usr/bin/env yum --quiet --color=never check-update | awk '{ split($1, a, "."); if (NF > 0) { print a[1] } }' | wc --lines | tr -d '\n'
+            {%- endif -%}
+          comment: packages number that need normal updates
+        - key: yum.security_updates
+          command: >
+            {% if yum__periodic_use_cached_updates_list|bool %}
+            /bin/bash -c "if [ -f {{ yum__cached_security_updates_file }} ]; then wc --lines < {{ yum__cached_security_updates_file }}; else echo -n 'ZBX_NOTSUPPORTED'; fi"
+            {% else %}
+            /usr/bin/env yum --quiet --color=never check-update --security | awk '{ split($1, a, "."); if (NF > 0) { print a[1] } }' | wc --lines | tr -d '\n'
+            {% endif %}
+          comment: packages number that need security updates
       state: present

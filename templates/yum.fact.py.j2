@@ -3,6 +3,7 @@
 # {{ ansible_managed }}
 
 import json
+import glob
 import os
 import re
 import subprocess
@@ -32,17 +33,26 @@ def setUpgradablesPackages(cmd, update_regexp, security_update_regexp=None):
         content['error'] = cmd[0] + ' not available'
         return
     try:
+{% if yum__periodic_use_cached_updates_list|bool %}
+        update_file_name = '{{ yum__cached_updates_file }}'
+        with open(update_file_name, 'r') as f:
+            content['packages_updates'] = map(lambda s:s.strip(), f.readlines())
+        security_update_file_name = '{{ yum__cached_security_updates_file }}'
+        with open(security_update_file_name, 'r') as f:
+            content['packages_security_updates'] = map(lambda s:s.strip(), f.readlines())
+{% else %}
         with open(os.devnull, 'w') as devnull:
             result = subprocess.check_output(' '.join(cmd), stderr=devnull, shell=True)
-    except subprocess.CalledProcessError as e:
-        content['error'] = str(e)
-        return
-    for line in result.splitlines():
+        for line in result.splitlines():
         match = update_regexp.match(line)
         if match:
             content['packages_updates'].append(match.group('name'))
             if security_update_regexp and security_update_regexp.search(line):
                 content['packages_security_updates'].append(match.group('name'))
+{% endif %}
+    except (subprocess.CalledProcessError,IOError) as e:
+        content['error'] = str(e)
+        return
 
 
 if __name__ == '__main__':
@@ -57,6 +67,12 @@ if __name__ == '__main__':
             content['reboot_required'] = False
     except subprocess.CalledProcessError as e:
         content['error'] = str(e)
+    # LAST UPDATE SUCCESS
+    content['update_last_success'] = -1
+    for cache_file in glob.glob('/var/cache/yum/*/*/base/cachecookie'):
+        if os.path.isfile(cache_file):
+            content['update_last_success'] = os.stat(cache_file).st_mtime
+            break
     # UPDATES
     setUpgradablesPackages(['/usr/bin/yum', '--color=never', '--quiet', 'check-update', '|| exit 0'],
                             reg_redhat_package_name)

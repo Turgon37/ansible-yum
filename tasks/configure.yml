@@ -15,7 +15,7 @@
 
 - name: Update yum-cron configurations
   template:
-    src:   yum-cron.j2
+    src:   yum-cron.conf.j2
     dest:  "{{ yum__conf_dir }}/{{ item.key~'.conf' }}"
     owner: root
     group: root
@@ -30,6 +30,19 @@
     group: root
     mode:  0644
   with_items: '{{ yum__plugins_conf_templates }}'
+
+- name: Configure cron job to update cached packages lists regularly
+  template:
+    src:   yum-packages-lists-update.cron.j2
+    dest:  /etc/cron.daily/yum-packages-lists-update.cron
+    mode:  0755
+  when: yum__periodic_use_cached_updates_list|bool
+
+- name: Remove cron job to update cached packages lists regularly
+  file:
+    path:  /etc/cron.daily/yum-packages-lists-update.cron
+    state: absent
+  when: not yum__periodic_use_cached_updates_list|bool
 
 #- import_tasks: configure-keys.yml
 #- import_tasks: configure-repositories.yml
