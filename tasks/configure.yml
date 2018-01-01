@@ -31,16 +31,22 @@
     mode:  0644
   with_items: '{{ yum__plugins_conf_templates }}'
 
+# the bloc below it to be removed after 07/01/2018
+- name: Remove old cron job
+  file:
+    path:  /etc/cron.daily/yum-packages-lists-update.cron
+    state: absent
+
 - name: Configure cron job to update cached packages lists regularly
   template:
     src:   yum-packages-lists-update.cron.j2
-    dest:  /etc/cron.daily/yum-packages-lists-update.cron
+    dest:  /etc/cron.daily/10yum-packages-lists-update.cron
     mode:  0755
   when: yum__periodic_use_cached_updates_list|bool
 
 - name: Remove cron job to update cached packages lists regularly
   file:
-    path:  /etc/cron.daily/yum-packages-lists-update.cron
+    path:  /etc/cron.daily/10yum-packages-lists-update.cron
     state: absent
   when: not yum__periodic_use_cached_updates_list|bool
 

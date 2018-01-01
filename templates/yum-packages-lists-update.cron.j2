@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# {{ ansible_managed }}
+
 # Update list of packages regulars updates
 /usr/bin/env yum --quiet --color=never check-update | awk '{ split($1, a, "."); if (NF > 0) { print a[1] } }' > {{ yum__cached_updates_file }} 2>/dev/null
 EXITVALUE=$?
@@ -7,6 +9,7 @@ EXITVALUE=$?
 if [ $EXITVALUE != 0 ]; then
   /usr/bin/logger --tag yum-cron-package-list-update --priority cron.error "ERROR: Regular packages list update exited abnormally with [$EXITVALUE]"
 fi
+
 
 # Update list of packages security updates
 /usr/bin/env yum --quiet --color=never check-update --security | awk '{ split($1, a, "."); if (NF > 0) { print a[1] } }' > {{ yum__cached_security_updates_file }} 2>/dev/null
