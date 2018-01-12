@@ -16,6 +16,7 @@
   fail:
     msg: 'This module only works on RedHat or derivatives like CentOS'
   when: ansible_os_family != 'RedHat'
+  tags: ['always']
 
 - import_tasks: install.yml
   tags: ['yum', 'yum-install']
