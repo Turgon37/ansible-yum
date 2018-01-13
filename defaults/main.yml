@@ -22,6 +22,8 @@ yum__repos_dir: /etc/yum.repos.d
 # Where to store yum working files
 yum__var_dir: /var/lib/yum
 
+# Directory where to store custom yum related scripts
+yum__custom_scripts_directory: /opt/yum-scripts
 
 ## Yum cron
 # Yum cron configurations

@@ -12,6 +12,7 @@
     - '{{ yum__plugins_conf_dir }}'
     - '{{ yum__plugin_post_actions_conf_dir }}'
     - '{{ yum__periodic_directory }}'
+    - '{{ yum__custom_scripts_directory }}'
 
 - name: Update yum-cron configurations
   template:
