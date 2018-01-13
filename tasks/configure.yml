@@ -51,5 +51,21 @@
     state: absent
   when: not yum__periodic_use_cached_updates_list|bool
 
+#- name: Configure cron job to run a yum clean regularly
+  #template:
+    #src:  yum-clean.cron.j2
+    #dest: /etc/cron.weekly/90yum-clean-cron.cron
+    #mode: 0755
+
+- name: Install custom yum scripts files
+  copy:
+    src:   '{{ item }}'
+    dest:  '{{ yum__custom_scripts_directory }}/{{ item }}'
+    owner: root
+    group: root
+    mode:  0755
+  with_items:
+    - check_kernel_grub_config.sh
+
 #- import_tasks: configure-keys.yml
 #- import_tasks: configure-repositories.yml
