@@ -13,7 +13,7 @@
     mode:     0440
   when: yum__post_transaction_action.state|d('present') == 'present'
 
-- name: 'Remove sudoers rule {{ yum__post_transaction_action.name }}'
+- name: 'Remove post transaction action {{ yum__post_transaction_action.name }}'
   file:
     path:  '{{ yum__plugin_post_actions_conf_dir }}/{{ yum__post_transaction_action.name }}.action'
     state: absent
