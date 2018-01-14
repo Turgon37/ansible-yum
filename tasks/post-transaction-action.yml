@@ -1,0 +1,20 @@
+---
+
+- fail:
+    msg: You must pass the variable yum__post_transaction_action with action specifications
+  when: yum__post_transaction_action is not defined
+
+- name: 'Create post transaction action {{ yum__post_transaction_action.name }}'
+  template:
+    src:      post-transaction-action.j2
+    dest:     '{{ yum__plugin_post_actions_conf_dir }}/{{ yum__post_transaction_action.name }}.action'
+    owner:    root
+    group:    root
+    mode:     0440
+  when: yum__post_transaction_action.state|d('present') == 'present'
+
+- name: 'Remove sudoers rule {{ yum__post_transaction_action.name }}'
+  file:
+    path:  '{{ yum__plugin_post_actions_conf_dir }}/{{ yum__post_transaction_action.name }}.action'
+    state: absent
+  when: yum__post_transaction_action.state|d('present') != 'present'

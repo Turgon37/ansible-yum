@@ -1,0 +1,7 @@
+##
+## {{ ansible_managed }}
+##
+
+{% for rule in yum__post_transaction_action.matches %}
+{{ rule.action_key }}:{{ rule.transaction_state }}:{{ rule.command }}
+{% endfor %}

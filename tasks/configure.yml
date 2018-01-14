@@ -61,5 +61,13 @@
   with_items:
     - check_kernel_grub_config.sh
 
+- name: set custom yum post transactions actions
+  include_role:
+    name: yum
+    tasks_from: post-transaction-action
+  vars:
+    yum__post_transaction_action: '{{ item }}'
+  with_items: '{{ yum__plugin_post_actions_custom_actions }}'
+
 #- import_tasks: configure-keys.yml
 #- import_tasks: configure-repositories.yml

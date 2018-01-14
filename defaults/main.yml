@@ -113,6 +113,15 @@ yum__plugin_post_actions_conf_dir: '{{ yum__conf_dir }}/post-actions'
 # Enable or not the yum post actions
 yum__plugin_post_actions_enabled: True
 
+# List of custom post actions to set by default
+yum__plugin_post_actions_custom_actions:
+  - name: 01kernel_grub_check
+    matches:
+      - action_key: kernel
+        transaction_state: any
+        command: '{{ yum__custom_scripts_directory }}/check_kernel_grub_config.sh'
+    state: present
+
 
 ## Misc
 # Directory where to store results of periodic tasks
