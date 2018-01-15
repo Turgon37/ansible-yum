@@ -39,6 +39,28 @@ The variables that can be passed to this role and a brief description about them
 | Name              | Types/Values | Description                       |
 | ------------------| -------------|---------------------------------- |
 
+## Role Types
+
+This role provide the following pseudo-type
+
+### A post transaction actions rule
+
+You can create custom post yum transaction actions from any other role by using the include role statement
+
+```
+- include_role:
+    name: yum
+    tasks_from: post-transaction-action
+  vars:
+    yum__post_transaction_action:
+      name: 01kernel_grub_check
+      matches:
+        - action_key: package_name
+          transaction_state: any
+          command: '{{ yum__custom_scripts_directory }}/custom_scripts.sh'
+      state: present
+```
+
 
 ## Example Playbook
 
