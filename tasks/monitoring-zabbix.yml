@@ -7,7 +7,7 @@
   vars:
     zabbix_agent__userparameter:
       name: yum
-      userparameter:
+      userparameters:
         - key: yum.cache_last_update_stamp
           command: /bin/bash -c 'if [ -f /var/cache/yum/*/*/base/cachecookie ]; then /usr/bin/env stat --format=%Y /var/cache/yum/*/*/base/cachecookie; else echo -n 0; fi' | tr -d '\n'
           comment: timestamp of the last yum cache update
